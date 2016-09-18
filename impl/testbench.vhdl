@@ -23,7 +23,8 @@ architecture default of testbench is
 			clk        : in  std_logic;
 			rst        : in  std_logic;
 			hlt        : out std_logic;
-			io         : inout std_logic_vector(7 downto 0);
+			io_in      : in  std_logic_vector(7 downto 0);
+			io_out     : out std_logic_vector(7 downto 0);
 			io_read    : out std_logic;
 			io_write   : out std_logic;
 			io_ready   : in  std_logic;
@@ -42,23 +43,26 @@ architecture default of testbench is
 		wait for 1 ns;
 	end procedure;
 
-	signal clk         : std_logic := '0';
+	signal clk          : std_logic := '0';
 
-	signal ram_we      : std_logic := '0';
-	signal ram_address : std_logic_vector(7 downto 0);
-	signal ram_input   : std_logic_vector(7 downto 0);
-	signal ram_output  : std_logic_vector(7 downto 0);
-	signal ram_enable  : std_logic := '0';
-	signal ram_ready   : std_logic := '0';
+	signal ram_we       : std_logic := '0';
+	signal ram_address  : std_logic_vector(7 downto 0);
+	signal ram_input    : std_logic_vector(7 downto 0);
+	signal ram_output   : std_logic_vector(7 downto 0);
+	signal ram_enable   : std_logic := '0';
+	signal ram_ready    : std_logic := '0';
 	
-	signal mem_address : std_logic_vector(7 downto 0);
+	signal mem_address  : std_logic_vector(7 downto 0);
 	
-	signal port_reg    : std_logic_vector(7 downto 0);	
-	signal port_read   : std_logic := '0';
-	signal port_write  : std_logic := '0';
-	signal port_ready  : std_logic := '0';
+	signal port_reg_in  : std_logic_vector(7 downto 0);
+	signal port_reg_out : std_logic_vector(7 downto 0);
+	signal port_read    : std_logic := '0';
+	signal port_write   : std_logic := '0';
+	signal port_ready   : std_logic := '0';
 
-	signal halt        : std_logic := '0';
+	signal halt         : std_logic := '0';
+	
+	signal port_tb_writing : std_logic := '0';
 	
 begin
 
@@ -74,7 +78,8 @@ begin
 		clk        => clk,
 		rst        => '0',
 		hlt        => halt,
-		io         => port_reg,
+		io_in      => port_reg_in,
+		io_out     => port_reg_out,
 		io_read    => port_read,
 		io_write   => port_write,
 		io_ready   => port_ready,
@@ -102,11 +107,13 @@ begin
 		write(
 			clk => clk, 
 			address => 0, 
-			value => 57); 
+		value => 24); 
+		--value => 57);
 		write(
 			clk => clk, 
-			address => 1, 
-			value => 100);
+		address => 1, 
+    value => 03);
+		--value => 1);
 		write(
 			clk => clk, 
 			address => 2, 
@@ -134,20 +141,23 @@ begin
 			
 			if port_ready = '1' then
 				if port_write = '1' then
-					report "Writing " & integer'image(to_integer(signed(port_reg))) & " out of the port";
-				end if;
-				if port_read = '1' then
-					report "Reading " & integer'image(to_integer(signed(port_reg))) & " into the port";
+					report "Writing " & integer'image(to_integer(signed(port_reg_out))) & " out of the port";
 				end if;
 				if port_write = '0' and port_read = '0' then
 					port_ready <= '0';
 				end if;
+				port_tb_writing <= '0';
 			else
 				if port_write = '1' then
 					port_ready <= '1';
 				end if;
 				if port_read = '1' then
+					port_tb_writing <= '1';
+					port_reg_in <= std_logic_vector(to_signed(42, port_reg_in'length));
+					report "Reading 42 into the port";
 					port_ready <= '1';
+				else
+					port_tb_writing <= '0';
 				end if;
 			end if;
 			

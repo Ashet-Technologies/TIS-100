@@ -8,9 +8,10 @@ entity tis50 is
 		clk        : in  std_logic;
 		rst        : in  std_logic;
 		hlt        : out std_logic;
-		io         : inout std_logic_vector(7 downto 0);
-		io_read    : out std_logic;
-		io_write   : out std_logic;
+		io_in      : in  std_logic_vector(7 downto 0);
+		io_out     : out std_logic_vector(7 downto 0);
+		io_read    : out std_logic := '0';
+		io_write   : out std_logic := '0';
 		io_ready   : in  std_logic;
 		mem_addr   : out std_logic_vector(7 downto 0);
 		mem_val    : in  std_logic_vector(7 downto 0);
@@ -35,7 +36,9 @@ architecture standard of tis50 is
 		SUB_SRC,
 		SUB_IMM,
 		MOV_SRC,
+		MOV_SRC_WAITPORT,
 		MOV_IMM,
+		MOV_IMM_WAITPORT,
 		MOV_IMM_PORT,
 		JRO_SRC
 	);
@@ -52,6 +55,8 @@ architecture standard of tis50 is
 	signal fsm_state   : fsm_state_type := Init;
 
 	signal current_state : integer;
+	
+	signal port_writing : std_logic := '0';
 	
 begin
 
@@ -202,28 +207,69 @@ begin
 							fsm_state <= Init;
 					end case;
 				
-				when MOV_IMM =>
-					current_state <= 6;
-					case info1 is
-						when "0001" =>
-							ACC <= INFO2;
-							fsm_state <= Fetch;
-						when "0010" =>
-							ACC <= std_logic_vector(to_unsigned(0, ACC'Length));
-							fsm_state <= Fetch;
-						when "0011" =>
-							io_write <= '1';
-							if io_ready = '1' then
-								io <= info2;
-								fsm_state <= MOV_IMM_PORT;
-							end if;
-						when others =>
-							fsm_state <= Init;
-					end case;
-				when MOV_IMM_PORT =>
-					current_state <= 7;
-					io_write <= '0';
-					fsm_state <= Fetch;
+					when MOV_SRC =>
+						current_state <= 8;
+						case info2(3 downto 0) is
+							when "0001" =>
+								info2 <= ACC;
+								fsm_state <= MOV_IMM;
+							
+							when "0010" =>
+								info2 <= std_logic_vector(to_signed(0, info2'length));
+								fsm_state <= MOV_IMM;
+							
+							when "0011" =>
+								io_read <= '1';
+								fsm_state <= MOV_SRC_WAITPORT;
+								
+							when others =>
+								fsm_state <= Init;
+						end case;
+
+					when MOV_SRC_WAITPORT =>
+						current_state <= 10;
+						if io_ready = '1' then
+							info2 <= io_in;
+							fsm_state <= MOV_IMM;
+							io_read <= '0';
+						end if;
+								
+					-- Will provide MOV info2, <DST>
+					-- Is jumped from
+					-- MOV <SRC>, <DST> and
+					-- MOV <IMM>, <DST>
+					when MOV_IMM =>
+						current_state <= 6;
+						case info1 is
+							when "0001" =>
+								ACC <= info2;
+								fsm_state <= Fetch;
+								
+							when "0010" =>
+								ACC <= std_logic_vector(to_unsigned(0, ACC'Length));
+								fsm_state <= Fetch;
+							
+							when "0011" =>
+								io_write <= '1';
+								fsm_state <= MOV_IMM_WAITPORT;
+							
+							when others =>
+								fsm_state <= Init;
+						end case;
+
+					when MOV_IMM_WAITPORT =>
+						current_state <= 9;
+						if io_ready = '1' then
+							port_writing <= '1';
+							io_out <= info2;
+							fsm_state <= MOV_IMM_PORT;
+						end if;
+
+					when MOV_IMM_PORT =>
+						current_state <= 7;
+						io_write <= '0';
+						port_writing <= '0';
+						fsm_state <= Fetch;
 				
 				when others =>
 					current_state <= 99;

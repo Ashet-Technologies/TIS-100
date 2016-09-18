@@ -1,5 +1,5 @@
 $date
-  Sun Sep 18 16:50:55 2016
+  Sun Sep 18 18:05:55 2016
 $end
 $version
   GHDL v0
@@ -15,41 +15,45 @@ $var reg 8 % ram_output[7:0] $end
 $var reg 1 & ram_enable $end
 $var reg 1 ' ram_ready $end
 $var reg 8 ( mem_address[7:0] $end
-$var reg 8 ) port_reg[7:0] $end
-$var reg 1 * port_read $end
-$var reg 1 + port_write $end
-$var reg 1 , port_ready $end
-$var reg 1 - halt $end
+$var reg 8 ) port_reg_in[7:0] $end
+$var reg 8 * port_reg_out[7:0] $end
+$var reg 1 + port_read $end
+$var reg 1 , port_write $end
+$var reg 1 - port_ready $end
+$var reg 1 . halt $end
+$var reg 1 / port_tb_writing $end
 $scope module ram0 $end
-$var reg 1 . clock $end
-$var reg 1 / we $end
-$var reg 8 0 address[7:0] $end
-$var reg 8 1 datain[7:0] $end
-$var reg 8 2 dataout[7:0] $end
+$var reg 1 0 clock $end
+$var reg 1 1 we $end
+$var reg 8 2 address[7:0] $end
+$var reg 8 3 datain[7:0] $end
+$var reg 8 4 dataout[7:0] $end
 $comment ram is not handled $end
-$var reg 8 3 read_address[7:0] $end
+$var reg 8 5 read_address[7:0] $end
 $upscope $end
 $scope module tis0 $end
-$var reg 1 4 clk $end
-$var reg 1 5 rst $end
-$var reg 1 6 hlt $end
-$var reg 8 7 io[7:0] $end
-$var reg 1 8 io_read $end
-$var reg 1 9 io_write $end
-$var reg 1 : io_ready $end
-$var reg 8 ; mem_addr[7:0] $end
-$var reg 8 < mem_val[7:0] $end
-$var reg 1 = mem_enable $end
-$var reg 1 > mem_ready $end
-$var reg 8 ? ip[7:0] $end
-$var reg 8 @ acc[7:0] $end
-$var reg 8 A bak[7:0] $end
-$var reg 8 B instr_coded[7:0] $end
-$var reg 4 C instruction[3:0] $end
-$var reg 4 D info1[3:0] $end
-$var reg 8 E info2[7:0] $end
+$var reg 1 6 clk $end
+$var reg 1 7 rst $end
+$var reg 1 8 hlt $end
+$var reg 8 9 io_in[7:0] $end
+$var reg 8 : io_out[7:0] $end
+$var reg 1 ; io_read $end
+$var reg 1 < io_write $end
+$var reg 1 = io_ready $end
+$var reg 8 > mem_addr[7:0] $end
+$var reg 8 ? mem_val[7:0] $end
+$var reg 1 @ mem_enable $end
+$var reg 1 A mem_ready $end
+$var reg 8 B ip[7:0] $end
+$var reg 8 C acc[7:0] $end
+$var reg 8 D bak[7:0] $end
+$var reg 8 E instr_coded[7:0] $end
+$var reg 4 F instruction[3:0] $end
+$var reg 4 G info1[3:0] $end
+$var reg 8 H info2[7:0] $end
 $comment fsm_state is not handled $end
-$var integer 32 F current_state $end
+$var integer 32 I current_state $end
+$var reg 1 J port_writing $end
 $upscope $end
 $enddefinitions $end
 #0
@@ -62,403 +66,414 @@ U&
 0'
 bUUUUUUUU (
 bUUUUUUUU )
-U*
-U+
+bUUUUUUUU *
+0+
 0,
 0-
 0.
 0/
-bUUUUUUUU 0
-bUUUUUUUU 1
+00
+01
 bUUUUUUUU 2
 bUUUUUUUU 3
-04
-05
+bUUUUUUUU 4
+bUUUUUUUU 5
 06
-bUUUUUUUU 7
-U8
-U9
-0:
-bUUUUUUUU ;
-bUUUUUUUU <
-U=
-0>
+07
+08
+bUUUUUUUU 9
+bUUUUUUUU :
+0;
+0<
+0=
+bUUUUUUUU >
 bUUUUUUUU ?
-bUUUUUUUU @
-bUUUUUUUU A
+U@
+0A
 bUUUUUUUU B
-bUUUU C
-bUUUU D
+bUUUUUUUU C
+bUUUUUUUU D
 bUUUUUUUU E
-b10000000000000000000000000000000 F
+bUUUU F
+bUUUU G
+bUUUUUUUU H
+b10000000000000000000000000000000 I
+0J
 #1000000
 1!
 1"
 b00000000 #
-b00111001 $
-b00111001 %
+b00011000 $
+b00011000 %
 0&
-1.
-1/
-b00000000 0
-b00111001 1
-b00111001 2
-b00000000 3
-14
-b00111001 <
-0=
-b00000000 ?
-b00000000 @
-b00000000 A
-b0 F
+10
+11
+b00000000 2
+b00011000 3
+b00011000 4
+b00000000 5
+16
+b00011000 ?
+0@
+b00000000 B
+b00000000 C
+b00000000 D
+b0 I
 #2000000
 0!
-0.
-04
+00
+06
 #3000000
 1!
 b00000001 #
-b01100100 $
-b01100100 %
+b00000011 $
+b00000011 %
 1&
 b00000000 (
-1.
-b00000001 0
-b01100100 1
-b01100100 2
-b00000001 3
-14
-b00000000 ;
-b01100100 <
-1=
-b1 F
+10
+b00000001 2
+b00000011 3
+b00000011 4
+b00000001 5
+16
+b00000000 >
+b00000011 ?
+1@
+b1 I
 #4000000
 0!
-0.
-04
+00
+06
 #5000000
 1!
 b00000010 #
 b00000000 $
 b00000000 %
-1.
-b00000010 0
-b00000000 1
-b00000000 2
-b00000010 3
-14
-b00000000 <
+10
+b00000010 2
+b00000000 3
+b00000000 4
+b00000010 5
+16
+b00000000 ?
 #6000000
 0!
-0.
-04
+00
+06
 #7000000
 1!
 b00000011 #
-1.
-b00000011 0
-b00000011 3
-14
+10
+b00000011 2
+b00000011 5
+16
 #8000000
 0!
-0.
-04
+00
+06
 #9000000
 1!
 b00000100 #
 b00000111 $
 b00000111 %
-1.
-b00000100 0
-b00000111 1
-b00000111 2
-b00000100 3
-14
-b00000111 <
+10
+b00000100 2
+b00000111 3
+b00000111 4
+b00000100 5
+16
+b00000111 ?
 #10000000
 0!
-0.
-04
+00
+06
 #11000000
 1!
 0"
 b00000000 #
-b00111001 %
+b00011000 %
 1'
-1.
-0/
-b00000000 0
-b00111001 2
-b00000000 3
-14
-b00111001 <
-1>
+10
+01
+b00000000 2
+b00011000 4
+b00000000 5
+16
+b00011000 ?
+1A
 #12000000
 0!
-0.
-04
+00
+06
 #13000000
 1!
 0&
-1.
-14
-0=
-b00000001 ?
-b00111001 B
-b1001 C
-b0011 D
-b10 F
+10
+16
+0@
+b00000001 B
+b00011000 E
+b1000 F
+b0001 G
+b10 I
 #14000000
 0!
-0.
-04
+00
+06
 #15000000
 1!
 1&
 0'
 b00000001 (
-1.
-14
-b00000001 ;
-1=
-0>
-b11 F
+10
+16
+b00000001 >
+1@
+0A
+b11 I
 #16000000
 0!
-0.
-04
+00
+06
 #17000000
 1!
 b00000001 #
-b01100100 %
+b00000011 %
 1'
-1.
-b00000001 0
-b01100100 2
-b00000001 3
-14
-b01100100 <
-1>
+10
+b00000001 2
+b00000011 4
+b00000001 5
+16
+b00000011 ?
+1A
 #18000000
 0!
-0.
-04
+00
+06
 #19000000
 1!
 0&
-1.
-14
-0=
-b00000010 ?
-b01100100 E
-b100 F
+10
+16
+0@
+b00000010 B
+b00000011 H
+b100 I
 #20000000
 0!
-0.
-04
+00
+06
 #21000000
 1!
 0'
-1.
-14
-0>
-b101 F
+10
+16
+0A
+b101 I
 #22000000
 0!
-0.
-04
+00
+06
 #23000000
 1!
 1+
-1.
-14
-19
-b110 F
+10
+16
+1;
+b1000 I
 #24000000
 0!
-0.
-04
+00
+06
 #25000000
 1!
-b01100100 )
-1,
-1.
-14
-b01100100 7
-1:
+b00101010 )
+0+
+1-
+1/
+10
+16
+b00101010 9
+0;
+1=
+b00101010 H
+b1010 I
 #26000000
 0!
-0.
-04
+00
+06
 #27000000
 1!
-0+
-1.
-14
-09
-b111 F
+0-
+0/
+10
+16
+0=
+b00101010 C
+b110 I
 #28000000
 0!
-0.
-04
+00
+06
 #29000000
 1!
 1&
 b00000010 (
-1.
-14
-b00000010 ;
-1=
-b1 F
+10
+16
+b00000010 >
+1@
+b1 I
 #30000000
 0!
-0.
-04
+00
+06
 #31000000
 1!
 b00000010 #
 b00000000 %
 1'
-1.
-b00000010 0
-b00000000 2
-b00000010 3
-14
-b00000000 <
-1>
+10
+b00000010 2
+b00000000 4
+b00000010 5
+16
+b00000000 ?
+1A
 #32000000
 0!
-0.
-04
+00
+06
 #33000000
 1!
 0&
-1.
-14
-0=
-b00000011 ?
-b00000000 B
-b0000 C
-b0000 D
-b10 F
+10
+16
+0@
+b00000011 B
+b00000000 E
+b0000 F
+b0000 G
+b10 I
 #34000000
 0!
-0.
-04
+00
+06
 #35000000
 1!
 0'
-1.
-14
-0>
-b101 F
+10
+16
+0A
+b101 I
 #36000000
 0!
-0.
-04
+00
+06
 #37000000
 1!
 1&
 b00000011 (
-1.
-14
-b00000011 ;
-1=
-b1 F
+10
+16
+b00000011 >
+1@
+b1 I
 #38000000
 0!
-0.
-04
+00
+06
 #39000000
 1!
 b00000011 #
 1'
-1.
-b00000011 0
-b00000011 3
-14
-1>
+10
+b00000011 2
+b00000011 5
+16
+1A
 #40000000
 0!
-0.
-04
+00
+06
 #41000000
 1!
 0&
-1.
-14
-0=
-b00000100 ?
-b10 F
+10
+16
+0@
+b00000100 B
+b10 I
 #42000000
 0!
-0.
-04
+00
+06
 #43000000
 1!
 0'
-1.
-14
-0>
-b101 F
+10
+16
+0A
+b101 I
 #44000000
 0!
-0.
-04
+00
+06
 #45000000
 1!
 1&
 b00000100 (
-1.
-14
-b00000100 ;
-1=
-b1 F
+10
+16
+b00000100 >
+1@
+b1 I
 #46000000
 0!
-0.
-04
+00
+06
 #47000000
 1!
 b00000100 #
 b00000111 %
 1'
-1.
-b00000100 0
-b00000111 2
-b00000100 3
-14
-b00000111 <
-1>
+10
+b00000100 2
+b00000111 4
+b00000100 5
+16
+b00000111 ?
+1A
 #48000000
 0!
-0.
-04
+00
+06
 #49000000
 1!
 0&
-1.
-14
-0=
-b00000101 ?
-b00000111 B
-b0111 C
-b10 F
+10
+16
+0@
+b00000101 B
+b00000111 E
+b0111 F
+b10 I
 #50000000
 0!
-0.
-04
+00
+06
 #51000000
 1!
 0'
-1.
-14
-0>
-b101 F
+10
+16
+0A
+b101 I
 #52000000
 0!
-1-
-0.
-04
-16
+1.
+00
+06
+18
 #53000000

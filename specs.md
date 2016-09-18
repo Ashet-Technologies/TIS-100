@@ -142,8 +142,8 @@ each emphasised character has a special meaning.
 | NEG              | 0x05                |                            | Yes     |
 | JRO <SRC>        | 0x*S*6              | S = `<SRC>`                |
 | HLT              | 0x07                |                            | Yes     |
-| MOV <SRC>, <DST> | 0x08 0x*DS*         | D = `<DST>`, S = `<SRC>`   |
-| MOV <IMM>, <DST> | 0x*D*9 *IMM*        | D = `<DST>`, IMM = `<IMM>` |
+| MOV <SRC>, <DST> | 0x*D*8 0x0*S*       | D = `<DST>`, S = `<SRC>`   |
+| MOV <IMM>, <DST> | 0x*D*9 *IMM*        | D = `<DST>`, IMM = `<IMM>` | Yes     |
 | ADD <IMM>        | 0x0A *IMM*          | IMM = `<IMM>`              | Yes     |
 | SUB <IMM>        | 0x0B *IMM*          | IMM = `<IMM>`              | Yes     |
 | JMP <DEST>       | 0x0C *DEST*         | DEST = `<DEST>`            | Yes     |
