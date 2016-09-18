@@ -67,8 +67,8 @@ begin
 				when Init =>
 					current_state <= 0;
 					IP         <= std_logic_vector(to_unsigned(0, IP'Length));
-					ACC        <= std_logic_vector(to_unsigned(204, ACC'Length));
-					BAK        <= std_logic_vector(to_unsigned(51, BAK'Length));
+					ACC        <= std_logic_vector(to_unsigned(0, ACC'Length));
+					BAK        <= std_logic_vector(to_unsigned(0, BAK'Length));
 					mem_enable <= '0';
 					fsm_state  <= Fetch;
 					

@@ -97,11 +97,11 @@ begin
 		write(
 			clk => clk, 
 			address => 0, 
-			value => 1); -- SWP
+			value => 11); -- SUB <IMM>
 		write(
 			clk => clk, 
 			address => 1, 
-			value => 2); -- SAV
+			value => 42); -- 42
 		write(
 			clk => clk, 
 			address => 2, 
