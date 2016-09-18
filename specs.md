@@ -145,10 +145,10 @@ each emphasised character has a special meaning.
 | ADD <IMM>        | 0x0A *IMM*          | IMM = `<IMM>`              | Yes     |
 | SUB <IMM>        | 0x0B *IMM*          | IMM = `<IMM>`              | Yes     |
 | JMP <DEST>       | 0x0C *DEST*         | DEST = `<DEST>`            | Yes     |
-| JEZ <DEST>       | 0x1C *DEST*         | DEST = `<DEST>`            |
-| JNZ <DEST>       | 0x2C *DEST*         | DEST = `<DEST>`            |
-| JGZ <DEST>       | 0x3C *DEST*         | DEST = `<DEST>`            |
-| JLZ <DEST>       | 0x4C *DEST*         | DEST = `<DEST>`            |
+| JEZ <DEST>       | 0x1C *DEST*         | DEST = `<DEST>`            | Yes     |
+| JNZ <DEST>       | 0x2C *DEST*         | DEST = `<DEST>`            | Yes     |
+| JGZ <DEST>       | 0x3C *DEST*         | DEST = `<DEST>`            | Yes     |
+| JLZ <DEST>       | 0x4C *DEST*         | DEST = `<DEST>`            | Yes     |
 | JRO <IMM>        | 0x0D *IMM*          | IMM = `<IMM>`              |
 |                  | 0x0E *???*          | Reserved for later use.    |
 |                  | 0x0F *???*          | Reserved for later use.    |

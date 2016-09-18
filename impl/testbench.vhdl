@@ -105,11 +105,11 @@ begin
 		write(
 			clk => clk, 
 			address => 1, 
-			value => 255); -- 1
+			value => 255);
 		write(
 			clk => clk, 
 			address => 2, 
-			value => 28); -- JEZ <DEST> 
+			value => 76); -- JLZ <DEST> 
 		write(
 			clk => clk, 
 			address => 3, 
