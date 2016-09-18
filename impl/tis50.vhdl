@@ -71,6 +71,7 @@ begin
 					BAK        <= std_logic_vector(to_unsigned(51, BAK'Length));
 					mem_enable <= '0';
 					fsm_state  <= Fetch;
+					
 				when Fetch =>
 					current_state <= 1;
 					mem_addr    <= IP;
@@ -78,15 +79,18 @@ begin
 					if mem_ready = '1' then
 						fsm_state <= Fetch_Ready;
 					end if;
+				
 				when Fetch_Ready =>
 					current_state <= 2;
 					instr_coded <= mem_val;
+					mem_enable  <= '0';
 					IP          <= std_logic_vector(unsigned(IP) + to_unsigned(1, IP'Length));
 					if mem_val(3) = '1' then
 						fsm_state <= FetchMore;
 					else
 						fsm_state <= Decode;
 					end if;
+				
 				when FetchMore =>
 					current_state <= 3;
 					mem_addr   <= IP;
@@ -94,73 +98,94 @@ begin
 					if mem_ready = '1' then
 						fsm_state <= FetchMore_Ready;
 					end if;
+				
 				when FetchMore_Ready =>
 					current_state <= 4;
-					info2     <= mem_val;
-					IP        <= std_logic_vector(unsigned(IP) + to_unsigned(1, IP'Length));
-					fsm_state <= Decode;
+					mem_enable  <= '0';
+					info2       <= mem_val;
+					IP          <= std_logic_vector(unsigned(IP) + to_unsigned(1, IP'Length));
+					fsm_state   <= Decode;
+				
 				when Decode =>
 					current_state <= 5;
 					case to_integer(unsigned(instruction)) is
 						when 0 => -- NOP
 							fsm_state <= Fetch;
+							
 						when 1 => -- SWP
 							ACC <= BAK;
 							BAK <= ACC;
 							fsm_state <= Fetch;
+						
 						when 2 => -- SAV
 							BAK <= ACC;
 							fsm_state <= Fetch;
+						
 						when 3 => -- ADD <SRC>
 							fsm_state <= ADD_SRC;
+						
 						when 4 => -- SUB <SRC>
 							fsm_state <= SUB_SRC;
+						
 						when 5 => -- NEG
 							ACC <= std_logic_vector(-signed(ACC));
 							fsm_state <= Fetch;
+						
 						when 6 => -- JRO <SRC>
 							fsm_state <= JRO_SRC;
+						
 						when 8 => -- MOV <SRC>, <DST>
 							fsm_state <= MOV_SRC;
+						
 						when 9 => -- MOV <IMM>, <DST>
 							fsm_state <= MOV_IMM;
+						
 						when 10 => -- ADD <IMM>
 							ACC <= std_logic_vector(signed(ACC) + signed(info2));
 							fsm_state <= Fetch;
+						
 						when 11 => -- SUB <IMM>
 							ACC <= std_logic_vector(signed(ACC) - signed(info2));
 							fsm_state <= Fetch;
+						
 						when 12 => -- JMP, JEZ, JNZ, JGZ, JLZ
 							case info1 is
 								when "0000" => -- JMP
 									IP <= info2;
 									fsm_state <= Fetch;
+								
 								when "0001" => -- JEZ
 									if signed(ACC) = 0 then
 										IP <= info2;
 									end if;
 									fsm_state <= Fetch;
+								
 								when "0010" => -- JNZ
 									if signed(ACC) /= 0 then
 										IP <= info2;
 									end if;
 									fsm_state <= Fetch;
+								
 								when "0011" => -- JGZ
 									if signed(ACC) > 0 then
 										IP <= info2;
 									end if;
 									fsm_state <= Fetch;
+								
 								when "0100" => -- JLZ
 									if signed(ACC) < 0 then
 										IP <= info2;
 									end if;
 									fsm_state <= Fetch;
+								
 								when others =>
 									fsm_state <= Init;
 							end case;
+						
 						when 13 => -- JRO <IMM>
 							IP <= std_logic_vector(unsigned(IP) + unsigned(info2));
 							fsm_state <= Fetch;
+						
 						when others =>
 							fsm_state <= Init;
 					end case;

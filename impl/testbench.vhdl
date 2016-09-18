@@ -105,7 +105,7 @@ begin
 		write(
 			clk => clk, 
 			address => 2, 
-			value => 0); 
+			value => 5); -- NEG 
 		write(
 			clk => clk, 
 			address => 3, 
