@@ -116,11 +116,13 @@ Jumps to the address `<DEST>` if `ACC` is less than zero.
 
 ### JRO <SRC>
 Jumps to the relative address given in `<SRC>`.
+> Note that some commands use 2 bytes and some commands only one.
 
 	IP ← IP + <SRC>;
 	
 ### JRO <IMM>
 Jumps to the relative address given with `<IMM>`.
+> Note that some commands use 2 bytes and some commands only one.
 
 	IP ← IP + <IMM>;
 
@@ -149,7 +151,7 @@ each emphasised character has a special meaning.
 | JNZ <DEST>       | 0x2C *DEST*         | DEST = `<DEST>`            | Yes     |
 | JGZ <DEST>       | 0x3C *DEST*         | DEST = `<DEST>`            | Yes     |
 | JLZ <DEST>       | 0x4C *DEST*         | DEST = `<DEST>`            | Yes     |
-| JRO <IMM>        | 0x0D *IMM*          | IMM = `<IMM>`              |
+| JRO <IMM>        | 0x0D *IMM*          | IMM = `<IMM>`              | Yes     |
 |                  | 0x0E *???*          | Reserved for later use.    |
 |                  | 0x0F *???*          | Reserved for later use.    |
 

@@ -196,7 +196,7 @@ begin
 							end case;
 						
 						when 13 => -- JRO <IMM>
-							IP <= std_logic_vector(unsigned(IP) + unsigned(info2));
+							IP <= std_logic_vector(unsigned(IP) + unsigned(info2) - 2);
 							fsm_state <= Fetch;
 						
 						when others =>

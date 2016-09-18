@@ -105,15 +105,15 @@ begin
 		write(
 			clk => clk, 
 			address => 1, 
-			value => 255);
+			value => 1);
 		write(
 			clk => clk, 
 			address => 2, 
-			value => 76); -- JLZ <DEST> 
+			value => 13); -- JRO <IMM> 
 		write(
 			clk => clk, 
 			address => 3, 
-			value => 0);
+			value => 254);
 		write(
 			clk => clk, 
 			address => 4, 
