@@ -5,6 +5,7 @@ Tesselated Intelligence System 50
 8 Bit
 
 ## Registers
+All registers have word size.
 
 ### ACC
 Accumulator, used for working.
@@ -19,12 +20,16 @@ Always zero, ignores writes.
 A write to this register writes a word to the port.
 A read from this register reads a word from the port.
 
+### IP
+Instruction pointer. Stores the next instruction that is executed.
+
 ## Instruction Set
 
 > Notation Hints:
 > <SRC> or <DST> means any of ACC, NIL or IO.
 > <IMM> means an immediate number from -128 to +127.
 > <DEST> means an address between 0 and 255.
+> IP is the instruction pointer.
 
 ### NOP
 Waits one cycle.
@@ -77,41 +82,41 @@ Negates `ACC`:
 ### JMP <DEST>
 Jumps to the address `<DEST>`.
 
-	$ ← <DEST>;
+	IP ← <DEST>;
 
 ### JEZ <DEST>
 Jumps to the address `<DEST>` if `ACC` is zero.
 
 	if ACC == 0:
-		$ ← <DEST>;
+		IP ← <DEST>;
 
 ### JNZ <DEST>
 Jumps to the address `<DEST>` if `ACC` is not zero.
 
 	if ACC != 0:
-		$ ← <DEST>;
+		IP ← <DEST>;
 
 ### JGZ <DEST>
 Jumps to the address `<DEST>` if `ACC` is greater than zero.
 
 	if ACC > 0:
-		$ ← <DEST>;
+		IP ← <DEST>;
 
 ### JLZ <DEST>
 Jumps to the address `<DEST>` if `ACC` is less than zero.
 
 	if ACC < 0:
-		$ ← <DEST>;
+		IP ← <DEST>;
 
 ### JRO <SRC>
 Jumps to the relative address given in `<SRC>`.
 
-	$ ← $ + <SRC>;
+	IP ← IP + <SRC>;
 	
 ### JRO <IMM>
 Jumps to the relative address given with `<IMM>`.
 
-	$ ← $ + <IMM>;
+	IP ← IP + <IMM>;
 
 ## Instruction Encoding
 Each instruction has a size of a mulitple of 8 bit.
