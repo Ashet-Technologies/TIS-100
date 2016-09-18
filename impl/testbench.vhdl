@@ -22,6 +22,7 @@ architecture default of testbench is
 		port(
 			clk        : in  std_logic;
 			rst        : in  std_logic;
+			hlt        : out std_logic;
 			io_in      : in  std_logic_vector(7 downto 0);
 			io_read    : in  std_logic;
 			io_out     : in  std_logic_vector(7 downto 0);
@@ -56,6 +57,8 @@ architecture default of testbench is
 	signal port_read   : std_logic := '0';
 	signal port_write  : std_logic := '0';
 
+	signal halt        : std_logic := '0';
+	
 begin
 
 	ram0: ram port map (
@@ -69,6 +72,7 @@ begin
 	tis0 : tis50 port map (
 		clk        => clk,
 		rst        => '0',
+		hlt        => halt,
 		io_in      => port_reg,
 		io_out     => port_reg,
 		io_read    => port_read,
@@ -97,21 +101,25 @@ begin
 		write(
 			clk => clk, 
 			address => 0, 
-			value => 11); -- SUB <IMM>
+			value => 10); -- ADD <IMM>
 		write(
 			clk => clk, 
 			address => 1, 
-			value => 42); -- 42
+			value => 255); -- 1
 		write(
 			clk => clk, 
 			address => 2, 
-			value => 5); -- NEG 
+			value => 28); -- JEZ <DEST> 
 		write(
 			clk => clk, 
 			address => 3, 
 			value => 0);
+		write(
+			clk => clk, 
+			address => 4, 
+			value => 7); -- HLT
 		
-		for i in 0 to 13 loop
+		while halt = '0' loop
 			if ram_enable = '1' then
 				ram_address <= mem_address;
 				ram_ready <= '1';
@@ -126,7 +134,7 @@ begin
 			tick(clk => clk);
 		end loop;
 		
-		-- assert false report "end of test" severity note;
+		assert false report "end of test" severity note;
 		wait;
 	end process;
 

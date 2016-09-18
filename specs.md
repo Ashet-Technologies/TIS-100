@@ -37,6 +37,9 @@ The CPU can address a maximum of 256 instructions which are stored in the progra
 ### NOP
 Waits one cycle.
 
+### HLT
+Halts the machine.
+
 ### MOV <SRC>, <DST>
 Copies `<SRC>` to `DST`.
 
@@ -127,28 +130,28 @@ Each instruction has a size of a mulitple of 8 bit.
 The encoding is noted in a list of hexadecimal values where
 each emphasised character has a special meaning.
 
-| Instruction      | Encoding            | Hints                      |
-|------------------|---------------------|----------------------------|
-| NOP              | 0x00                |                            |
-| SWP              | 0x01                |                            |
-| SAV              | 0x02                |                            |
+| Instruction      | Encoding            | Hints                      | Tested? |
+|------------------|---------------------|----------------------------|---------|
+| NOP              | 0x00                |                            | Yes     |
+| SWP              | 0x01                |                            | Yes     | 
+| SAV              | 0x02                |                            | Yes     |
 | ADD <SRC>        | 0x*S*3              | S = `<SRC>`                |
 | SUB <SRC>        | 0x*S*4              | S = `<SRC>`                |
-| NEG              | 0x05                |                            |
+| NEG              | 0x05                |                            | Yes     |
 | JRO <SRC>        | 0x*S*6              | S = `<SRC>`                |
-| NOP              | 0x07                | Reserved for later use.    |
+| HLT              | 0x07                |                            | Yes     |
 | MOV <SRC>, <DST> | 0x08 0x*DS*         | D = `<DST>`, S = `<SRC>`   |
 | MOV <IMM>, <DST> | 0x*D*9 *IMM*        | D = `<DST>`, IMM = `<IMM>` |
-| ADD <IMM>        | 0x0A *IMM*          | IMM = `<IMM>`              |
-| SUB <IMM>        | 0x0B *IMM*          | IMM = `<IMM>`              |
-| JMP <DEST>       | 0x0C *DEST*         | DEST = `<DEST>`            |
+| ADD <IMM>        | 0x0A *IMM*          | IMM = `<IMM>`              | Yes     |
+| SUB <IMM>        | 0x0B *IMM*          | IMM = `<IMM>`              | Yes     |
+| JMP <DEST>       | 0x0C *DEST*         | DEST = `<DEST>`            | Yes     |
 | JEZ <DEST>       | 0x1C *DEST*         | DEST = `<DEST>`            |
 | JNZ <DEST>       | 0x2C *DEST*         | DEST = `<DEST>`            |
 | JGZ <DEST>       | 0x3C *DEST*         | DEST = `<DEST>`            |
 | JLZ <DEST>       | 0x4C *DEST*         | DEST = `<DEST>`            |
 | JRO <IMM>        | 0x0D *IMM*          | IMM = `<IMM>`              |
-| NOP              | 0x0E *???*          | Reserved for later use.    |
-| NOP              | 0x0F *???*          | Reserved for later use.    |
+|                  | 0x0E *???*          | Reserved for later use.    |
+|                  | 0x0F *???*          | Reserved for later use.    |
 
 ### <SRC>, <DST> Encoding
 A `<SRC>` or `<DST>` target is encoded with a nibble (4 bits).

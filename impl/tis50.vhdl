@@ -7,6 +7,7 @@ entity tis50 is
 	port(
 		clk        : in  std_logic;
 		rst        : in  std_logic;
+		hlt        : out std_logic;
 		io_in      : in  std_logic_vector(7 downto 0);
 		io_read    : in  std_logic;
 		io_out     : in  std_logic_vector(7 downto 0);
@@ -23,6 +24,7 @@ architecture standard of tis50 is
 	
 	type fsm_state_type is (
 		Init,
+		Halted,
 		Fetch,
 		Fetch_Ready,
 		FetchMore,
@@ -62,6 +64,11 @@ begin
 		if rst = '1' then
 			fsm_state <= Init;
 		end if;
+		if fsm_state = Halted then
+			hlt <= '1';
+		else
+			hlt <= '0';
+		end if;
 		if rising_edge(clk) then
 			case fsm_state is
 				when Init =>
@@ -71,7 +78,10 @@ begin
 					BAK        <= std_logic_vector(to_unsigned(0, BAK'Length));
 					mem_enable <= '0';
 					fsm_state  <= Fetch;
-					
+				
+				when Halted =>
+					-- Does nothing anymore...
+				
 				when Fetch =>
 					current_state <= 1;
 					mem_addr    <= IP;
@@ -133,6 +143,9 @@ begin
 						
 						when 6 => -- JRO <SRC>
 							fsm_state <= JRO_SRC;
+						
+						when 7 => -- HLT
+							fsm_state <= Halted;
 						
 						when 8 => -- MOV <SRC>, <DST>
 							fsm_state <= MOV_SRC;
