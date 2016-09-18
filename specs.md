@@ -158,12 +158,12 @@ each emphasised character has a special meaning.
 ### <SRC>, <DST> Encoding
 A `<SRC>` or `<DST>` target is encoded with a nibble (4 bits).
 
-| Value | Target  |
-|-------|---------|
-| 0x0   | Invalid |
-| 0x1   | ACC     |
-| 0x2   | NIL     |
-| 0x3   | IO      |
+| Value    | Target       |
+|----------|--------------|
+| 0x0      | Invalid      |
+| 0x1      | ACC          |
+| 0x2      | NIL          |
+| 0x8..0xF | IO Port 0..7 |
 
 ### <IMM> Encoding
 An immediate value is encoded with an 8 bit [two's complement](https://en.wikipedia.org/wiki/Two%27s_complement) value.

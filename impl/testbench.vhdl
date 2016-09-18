@@ -28,6 +28,7 @@ architecture default of testbench is
 			io_read    : out std_logic;
 			io_write   : out std_logic;
 			io_ready   : in  std_logic;
+			io_port    : out std_logic_vector(2 downto 0);
 			mem_addr   : out std_logic_vector(7 downto 0);
 			mem_val    : in  std_logic_vector(7 downto 0);
 			mem_enable : out std_logic;
@@ -59,7 +60,8 @@ architecture default of testbench is
 	signal port_read    : std_logic := '0';
 	signal port_write   : std_logic := '0';
 	signal port_ready   : std_logic := '0';
-
+	signal port_num     : std_logic_vector(2 downto 0);
+	
 	signal halt         : std_logic := '0';
 	
 	signal port_tb_writing : std_logic := '0';
@@ -83,6 +85,7 @@ begin
 		io_read    => port_read,
 		io_write   => port_write,
 		io_ready   => port_ready,
+		io_port    => port_num,
 		mem_addr   => mem_address,
 		mem_val    => ram_output,
 		mem_enable => ram_enable,
@@ -107,15 +110,15 @@ begin
 		write(
 			clk => clk, 
 			address => 0, 
-			value => 25); 
+			value => 16#18#); 
 		write(
 			clk => clk, 
 			address => 1, 
-			value => 2);
+			value => 16#0F#);
 		write(
 			clk => clk, 
 			address => 2, 
-			value => 22);
+			value => 0);
 		write(
 			clk => clk, 
 			address => 3, 
@@ -139,7 +142,12 @@ begin
 			
 			if port_ready = '1' then
 				if port_write = '1' then
-					report "Writing " & integer'image(to_integer(signed(port_reg_out))) & " out of the port";
+					report
+						"Writing " & 
+						integer'image(to_integer(signed(port_reg_out))) & 
+						" out of the port(" &
+						integer'image(to_integer(unsigned(port_num))) & 
+						")";
 				end if;
 				if port_write = '0' and port_read = '0' then
 					port_ready <= '0';
@@ -152,7 +160,7 @@ begin
 				if port_read = '1' then
 					port_tb_writing <= '1';
 					port_reg_in <= std_logic_vector(to_signed(42, port_reg_in'length));
-					report "Reading 42 into the port";
+					report "Reading 42 into the port(" & integer'image(to_integer(unsigned(port_num))) & ")";
 					port_ready <= '1';
 				else
 					port_tb_writing <= '0';

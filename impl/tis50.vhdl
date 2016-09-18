@@ -13,6 +13,7 @@ entity tis50 is
 		io_read    : out std_logic := '0';
 		io_write   : out std_logic := '0';
 		io_ready   : in  std_logic;
+		io_port    : out std_logic_vector(2 downto 0);
 		mem_addr   : out std_logic_vector(7 downto 0);
 		mem_val    : in  std_logic_vector(7 downto 0);
 		mem_enable : out std_logic;
@@ -219,29 +220,30 @@ begin
 				
 					when READ_SRC =>
 						current_state <= 8;
-						case src_index is
-							when "0001" =>
-								info2 <= ACC;
-								fsm_state <= fsm_state_nx;
-							
-							when "0010" =>
-								info2 <= std_logic_vector(to_signed(0, info2'length));
-								fsm_state <= fsm_state_nx;
-							
-							when "0011" =>
-								io_read <= '1';
-								if io_ready = '1' then
-									info2 <= io_in;
+						if src_index(3) = '0' then
+							case src_index is
+								when "0001" =>
+									info2 <= ACC;
 									fsm_state <= fsm_state_nx;
-									io_read <= '0';
-								end if;
 								
-							when others =>
-								assert false
-									report "Invalid <SRC>:" & integer'image(to_integer(unsigned(src_index)))
-									severity failure;
-								fsm_state <= Init;
-						end case;
+								when "0010" =>
+									info2 <= std_logic_vector(to_signed(0, info2'length));
+									fsm_state <= fsm_state_nx;
+								when others =>
+									assert false
+										report "Invalid <SRC>:" & integer'image(to_integer(unsigned(src_index)))
+										severity failure;
+									fsm_state <= Init;
+							end case;
+						else
+							io_read <= '1';
+							io_port <= src_index(2 downto 0);
+							if io_ready = '1' then
+								info2 <= io_in;
+								fsm_state <= fsm_state_nx;
+								io_read <= '0';
+							end if;						
+						end if;
 
 					when ADD_IMM => -- ADD <IMM>
 						ACC <= std_logic_vector(signed(ACC) + signed(info2));
@@ -262,26 +264,31 @@ begin
 					-- MOV <IMM>, <DST>
 					when MOV_IMM =>
 						current_state <= 6;
-						case info1 is
-							when "0001" =>
-								ACC <= info2;
-								fsm_state <= Fetch;
+						if info1(3) = '0' then
+							case info1 is
+								when "0001" =>
+									ACC <= info2;
+									fsm_state <= Fetch;
+									
+								when "0010" =>
+									ACC <= std_logic_vector(to_unsigned(0, ACC'Length));
+									fsm_state <= Fetch;
 								
-							when "0010" =>
-								ACC <= std_logic_vector(to_unsigned(0, ACC'Length));
-								fsm_state <= Fetch;
-							
-							when "0011" =>
-								io_write <= '1';
+								when others =>
+									assert false
+										report "Invalid <DST>:" & integer'image(to_integer(unsigned(info1)))
+										severity failure;
+									fsm_state <= Init;
+							end case;
+						else
+							io_write <= '1';
+							io_port  <= info1(2 downto 0);
 							if io_ready = '1' then
 								port_writing <= '1';
 								io_out <= info2;
 								fsm_state <= MOV_IMM_PORT;
 							end if;
-
-							when others =>
-								fsm_state <= Init;
-						end case;
+						end if;
 
 					when MOV_IMM_PORT =>
 						current_state <= 7;
