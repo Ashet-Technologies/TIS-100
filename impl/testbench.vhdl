@@ -23,10 +23,10 @@ architecture default of testbench is
 			clk        : in  std_logic;
 			rst        : in  std_logic;
 			hlt        : out std_logic;
-			io_in      : in  std_logic_vector(7 downto 0);
-			io_read    : in  std_logic;
-			io_out     : in  std_logic_vector(7 downto 0);
-			io_write   : in  std_logic;
+			io         : inout std_logic_vector(7 downto 0);
+			io_read    : out std_logic;
+			io_write   : out std_logic;
+			io_ready   : in  std_logic;
 			mem_addr   : out std_logic_vector(7 downto 0);
 			mem_val    : in  std_logic_vector(7 downto 0);
 			mem_enable : out std_logic;
@@ -56,6 +56,7 @@ architecture default of testbench is
 	signal port_reg    : std_logic_vector(7 downto 0);	
 	signal port_read   : std_logic := '0';
 	signal port_write  : std_logic := '0';
+	signal port_ready  : std_logic := '0';
 
 	signal halt        : std_logic := '0';
 	
@@ -73,10 +74,10 @@ begin
 		clk        => clk,
 		rst        => '0',
 		hlt        => halt,
-		io_in      => port_reg,
-		io_out     => port_reg,
+		io         => port_reg,
 		io_read    => port_read,
 		io_write   => port_write,
+		io_ready   => port_ready,
 		mem_addr   => mem_address,
 		mem_val    => ram_output,
 		mem_enable => ram_enable,
@@ -101,19 +102,19 @@ begin
 		write(
 			clk => clk, 
 			address => 0, 
-			value => 10); -- ADD <IMM>
+			value => 57); 
 		write(
 			clk => clk, 
 			address => 1, 
-			value => 1);
+			value => 100);
 		write(
 			clk => clk, 
 			address => 2, 
-			value => 13); -- JRO <IMM> 
+			value => 0);
 		write(
 			clk => clk, 
 			address => 3, 
-			value => 254);
+			value => 0);
 		write(
 			clk => clk, 
 			address => 4, 
@@ -127,10 +128,29 @@ begin
 				ram_ready <= '0';
 			end if;
 			
-			if port_write = '1' then
-				report "Writing " & integer'image(to_integer(signed(port_reg))) & " to the port";
+			if port_write = '1' and port_read = '1' then
+				assert false report "io_read and io_write are both set." severity error;
 			end if;
-
+			
+			if port_ready = '1' then
+				if port_write = '1' then
+					report "Writing " & integer'image(to_integer(signed(port_reg))) & " out of the port";
+				end if;
+				if port_read = '1' then
+					report "Reading " & integer'image(to_integer(signed(port_reg))) & " into the port";
+				end if;
+				if port_write = '0' and port_read = '0' then
+					port_ready <= '0';
+				end if;
+			else
+				if port_write = '1' then
+					port_ready <= '1';
+				end if;
+				if port_read = '1' then
+					port_ready <= '1';
+				end if;
+			end if;
+			
 			tick(clk => clk);
 		end loop;
 		

@@ -8,10 +8,10 @@ entity tis50 is
 		clk        : in  std_logic;
 		rst        : in  std_logic;
 		hlt        : out std_logic;
-		io_in      : in  std_logic_vector(7 downto 0);
-		io_read    : in  std_logic;
-		io_out     : in  std_logic_vector(7 downto 0);
-		io_write   : in  std_logic;
+		io         : inout std_logic_vector(7 downto 0);
+		io_read    : out std_logic;
+		io_write   : out std_logic;
+		io_ready   : in  std_logic;
 		mem_addr   : out std_logic_vector(7 downto 0);
 		mem_val    : in  std_logic_vector(7 downto 0);
 		mem_enable : out std_logic;
@@ -36,9 +36,8 @@ architecture standard of tis50 is
 		SUB_IMM,
 		MOV_SRC,
 		MOV_IMM,
-		JRO_SRC,
-		JRO_IMM,
-		JMP
+		MOV_IMM_PORT,
+		JRO_SRC
 	);
 	
 	signal IP          : std_logic_vector(7 downto 0);
@@ -202,6 +201,30 @@ begin
 						when others =>
 							fsm_state <= Init;
 					end case;
+				
+				when MOV_IMM =>
+					current_state <= 6;
+					case info1 is
+						when "0001" =>
+							ACC <= INFO2;
+							fsm_state <= Fetch;
+						when "0010" =>
+							ACC <= std_logic_vector(to_unsigned(0, ACC'Length));
+							fsm_state <= Fetch;
+						when "0011" =>
+							io_write <= '1';
+							if io_ready = '1' then
+								io <= info2;
+								fsm_state <= MOV_IMM_PORT;
+							end if;
+						when others =>
+							fsm_state <= Init;
+					end case;
+				when MOV_IMM_PORT =>
+					current_state <= 7;
+					io_write <= '0';
+					fsm_state <= Fetch;
+				
 				when others =>
 					current_state <= 99;
 					fsm_state <= Init;
