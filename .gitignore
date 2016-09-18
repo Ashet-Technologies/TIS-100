@@ -1,0 +1,4 @@
+# GHDL Files:
+*.o
+*.vcd
+*.cf
