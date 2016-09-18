@@ -1,0 +1,16 @@
+digraph {
+
+	START [shape=point, label=""];
+
+	START -> FETCH;
+	
+	FETCH -> DECODE;
+	
+	DECODE -> EXECUTE;
+	
+	DECODE -> FETCH_EXTRA;
+	
+	FETCH_EXTRA -> EXECUTE;
+	
+	EXECUTE -> FETCH;
+}

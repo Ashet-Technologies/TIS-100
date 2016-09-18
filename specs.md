@@ -23,6 +23,9 @@ A read from this register reads a word from the port.
 ### IP
 Instruction pointer. Stores the next instruction that is executed.
 
+## Program Memory
+The CPU can address a maximum of 256 instructions which are stored in the program memory.
+
 ## Instruction Set
 
 > Notation Hints:
@@ -127,22 +130,25 @@ each emphasised character has a special meaning.
 | Instruction      | Encoding            | Hints                  |
 |------------------|---------------------|------------------------|
 | NOP              | 0x00                |                        |
-| MOV <SRC>, <DST> | 0x01 0x*DS*         | D = <DST>, S = <SRC>   |
-| MOV <IMM>, <DST> | 0x*D*1 *IMM*        | D = <DST>, IMM = <IMM> |
-| SWP              | 0x02                |                        |
-| SAV              | 0x03                |                        |
-| ADD <SRC>        | 0x*S*4              | S = <SRC>              |
-| ADD <IMM>        | 0x05 *IMM*          | IMM = <IMM>            |
-| SUB <SRC>        | 0x*S*5              | S = <SRC>              |
-| SUB <IMM>        | 0x06 *IMM*          | IMM = <IMM>            |
-| NEG              | 0x07                |                        |
-| JMP <DEST>       | 0x08 *DEST*         | DEST = <DEST>          |
-| JEZ <DEST>       | 0x18 *DEST*         | DEST = <DEST>          |
-| JNZ <DEST>       | 0x28 *DEST*         | DEST = <DEST>          |
-| JGZ <DEST>       | 0x38 *DEST*         | DEST = <DEST>          |
-| JLZ <DEST>       | 0x48 *DEST*         | DEST = <DEST>          |
-| JRO <SRC>        | 0x*S*9              | S = <SRC>              |
-| JRO <IMM>        | 0x09 *IMM*          | IMM = <IMM>            |
+| NOP              | 0x07                |                        |
+| NOP              | 0x0E                |                        |
+| NOP              | 0x0F                |                        |
+| SWP              | 0x01                |                        |
+| SAV              | 0x02                |                        |
+| ADD <SRC>        | 0x*S*3              | S = <SRC>              |
+| SUB <SRC>        | 0x*S*4              | S = <SRC>              |
+| NEG              | 0x05                |                        |
+| JRO <SRC>        | 0x*S*6              | S = <SRC>              |
+| MOV <SRC>, <DST> | 0x08 0x*DS*         | D = <DST>, S = <SRC>   |
+| MOV <IMM>, <DST> | 0x*D*9 *IMM*        | D = <DST>, IMM = <IMM> |
+| ADD <IMM>        | 0x0A *IMM*          | IMM = <IMM>            |
+| SUB <IMM>        | 0x0B *IMM*          | IMM = <IMM>            |
+| JMP <DEST>       | 0x0C *DEST*         | DEST = <DEST>          |
+| JEZ <DEST>       | 0x1C *DEST*         | DEST = <DEST>          |
+| JNZ <DEST>       | 0x2C *DEST*         | DEST = <DEST>          |
+| JGZ <DEST>       | 0x3C *DEST*         | DEST = <DEST>          |
+| JLZ <DEST>       | 0x4C *DEST*         | DEST = <DEST>          |
+| JRO <IMM>        | 0x0D *IMM*          | IMM = <IMM>            |
 
 ### <SRC>, <DST> Encoding
 A `<SRC>` or `<DST>` target is encoded with a nibble (4 bits).
@@ -159,3 +165,47 @@ An immediate value is encoded with an 8 bit [two's complement](https://en.wikipe
 
 ### <DEST> Encoding
 A destination value is encoded by an unsigned 8 bit value.
+
+## CPU Pseudo Code
+This part documents the state machine the CPU is executing in pseudocode.
+
+	(info1*4, instr*4) ← read_byte(IP++);
+	info2*8 ← 0;
+	
+	if instr > 0x7 then
+			info2 ← read_byte(IP++);
+	end
+	
+	switch instr
+		case 0x0:
+		
+		case 0x1: 
+			ACC ← SAV, SAV ← ACC;
+		case 0x2:
+			SAV ← ACC;
+		case 0x3:
+			ACC ← ACC + reg(info1);
+		case 0x4:
+			ACC ← ACC - reg(info1);
+		case 0x5:
+			ACC ← -ACC;
+		case 0x6:
+			IP ← IP + reg(info1) - 1;
+		case 0x7:
+		case 0x8:
+			reg(info2[4..7]) ← reg(info2[0..3]);
+		case 0x9:
+			reg(info1) ← info2;
+		case 0xA:
+			ACC ← ACC + info2
+		case 0xB:
+			ACC ← ACC - info2
+		CASE 0xC:
+			if condition(info1) then
+				IP ← info2
+			end
+		case 0xD:
+			IP ← IP + info2 - 1;
+		case 0xE:
+		case 0xF:
+	end
