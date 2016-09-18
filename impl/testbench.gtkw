@@ -1,0 +1,33 @@
+[*]
+[*] GTKWave Analyzer v3.3.72 (w)1999-2016 BSI
+[*] Sun Sep 18 13:46:34 2016
+[*]
+[dumpfile] "/home/felix/projects/tis-50/impl/testbench.vcd"
+[dumpfile_mtime] "Sun Sep 18 13:44:17 2016"
+[dumpfile_size] 3142
+[savefile] "/home/felix/projects/tis-50/impl/testbench.gtkw"
+[timestart] 0
+[size] 1596 861
+[pos] -1 -1
+*-22.368488 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 229
+[signals_width] 167
+[sst_expanded] 1
+[sst_vpaned_height] 230
+@28
+tis0.clk
+@22
+tis0.acc[7:0]
+tis0.bak[7:0]
+@201
+-
+@22
+tis0.instruction[3:0]
+tis0.instr_coded[7:0]
+tis0.current_state
+@200
+-
+@22
+ram_address[7:0]
+[pattern_trace] 1
+[pattern_trace] 0
