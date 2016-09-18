@@ -31,29 +31,27 @@ architecture standard of tis50 is
 		FetchMore,
 		FetchMore_Ready,
 		Decode,
-		ADD_SRC,
 		ADD_IMM,
-		SUB_SRC,
 		SUB_IMM,
-		MOV_SRC,
-		MOV_SRC_WAITPORT,
+		JRO_IMM,
+		READ_SRC, -- requires fsm_state_nx
 		MOV_IMM,
-		MOV_IMM_WAITPORT,
-		MOV_IMM_PORT,
-		JRO_SRC
+		MOV_IMM_PORT
 	);
 	
-	signal IP          : std_logic_vector(7 downto 0);
-	signal ACC         : std_logic_vector(7 downto 0);
-	signal BAK         : std_logic_vector(7 downto 0);
+	signal IP           : std_logic_vector(7 downto 0);
+	signal ACC          : std_logic_vector(7 downto 0);
+	signal BAK          : std_logic_vector(7 downto 0);
 	
-	signal instr_coded : std_logic_vector(7 downto 0);
-	signal instruction : std_logic_vector(3 downto 0);
-	signal info1       : std_logic_vector(3 downto 0);
-	signal info2       : std_logic_vector(7 downto 0);
+	signal instr_coded  : std_logic_vector(7 downto 0);
+	signal instruction  : std_logic_vector(3 downto 0);
+	signal info1        : std_logic_vector(3 downto 0);
+	signal info2        : std_logic_vector(7 downto 0);
 	
-	signal fsm_state   : fsm_state_type := Init;
-
+	signal fsm_state    : fsm_state_type := Init;
+	signal fsm_state_nx : fsm_state_type := Init;
+	signal src_index    : std_logic_vector(3 downto 0);
+	
 	signal current_state : integer;
 	
 	signal port_writing : std_logic := '0';
@@ -136,23 +134,31 @@ begin
 							fsm_state <= Fetch;
 						
 						when 3 => -- ADD <SRC>
-							fsm_state <= ADD_SRC;
+							src_index    <= info1;
+							fsm_state_nx <= ADD_IMM;
+							fsm_state    <= READ_SRC;
 						
 						when 4 => -- SUB <SRC>
-							fsm_state <= SUB_SRC;
+							src_index    <= info1;
+							fsm_state_nx <= SUB_IMM;
+							fsm_state    <= READ_SRC;
 						
 						when 5 => -- NEG
 							ACC <= std_logic_vector(-signed(ACC));
 							fsm_state <= Fetch;
 						
 						when 6 => -- JRO <SRC>
-							fsm_state <= JRO_SRC;
+							src_index    <= info1;
+							fsm_state_nx <= JRO_IMM;
+							fsm_state    <= READ_SRC;
 						
 						when 7 => -- HLT
 							fsm_state <= Halted;
 						
 						when 8 => -- MOV <SRC>, <DST>
-							fsm_state <= MOV_SRC;
+							src_index    <= info2(3 downto 0);
+							fsm_state_nx <= MOV_IMM;
+							fsm_state    <= READ_SRC;
 						
 						when 9 => -- MOV <IMM>, <DST>
 							fsm_state <= MOV_IMM;
@@ -197,6 +203,7 @@ begin
 								
 								when others =>
 									fsm_state <= Init;
+									assert false report "Invalid jump opcode." severity failure;
 							end case;
 						
 						when 13 => -- JRO <IMM>
@@ -204,36 +211,51 @@ begin
 							fsm_state <= Fetch;
 						
 						when others =>
+							assert false
+								report "Invalid opcode:" & integer'image(to_integer(unsigned(instruction)))
+								severity failure;
 							fsm_state <= Init;
 					end case;
 				
-					when MOV_SRC =>
+					when READ_SRC =>
 						current_state <= 8;
-						case info2(3 downto 0) is
+						case src_index is
 							when "0001" =>
 								info2 <= ACC;
-								fsm_state <= MOV_IMM;
+								fsm_state <= fsm_state_nx;
 							
 							when "0010" =>
 								info2 <= std_logic_vector(to_signed(0, info2'length));
-								fsm_state <= MOV_IMM;
+								fsm_state <= fsm_state_nx;
 							
 							when "0011" =>
 								io_read <= '1';
-								fsm_state <= MOV_SRC_WAITPORT;
+								if io_ready = '1' then
+									info2 <= io_in;
+									fsm_state <= fsm_state_nx;
+									io_read <= '0';
+								end if;
 								
 							when others =>
+								assert false
+									report "Invalid <SRC>:" & integer'image(to_integer(unsigned(src_index)))
+									severity failure;
 								fsm_state <= Init;
 						end case;
 
-					when MOV_SRC_WAITPORT =>
-						current_state <= 10;
-						if io_ready = '1' then
-							info2 <= io_in;
-							fsm_state <= MOV_IMM;
-							io_read <= '0';
-						end if;
-								
+					when ADD_IMM => -- ADD <IMM>
+						ACC <= std_logic_vector(signed(ACC) + signed(info2));
+						fsm_state <= Fetch;
+					
+					when SUB_IMM => -- SUB <IMM>
+						ACC <= std_logic_vector(signed(ACC) - signed(info2));
+						fsm_state <= Fetch;
+					
+					when JRO_IMM => -- JRO <IMM>
+						IP <= std_logic_vector(unsigned(IP) + unsigned(info2) - 2);
+						fsm_state <= Fetch;
+						
+						
 					-- Will provide MOV info2, <DST>
 					-- Is jumped from
 					-- MOV <SRC>, <DST> and
@@ -251,19 +273,15 @@ begin
 							
 							when "0011" =>
 								io_write <= '1';
-								fsm_state <= MOV_IMM_WAITPORT;
-							
+							if io_ready = '1' then
+								port_writing <= '1';
+								io_out <= info2;
+								fsm_state <= MOV_IMM_PORT;
+							end if;
+
 							when others =>
 								fsm_state <= Init;
 						end case;
-
-					when MOV_IMM_WAITPORT =>
-						current_state <= 9;
-						if io_ready = '1' then
-							port_writing <= '1';
-							io_out <= info2;
-							fsm_state <= MOV_IMM_PORT;
-						end if;
 
 					when MOV_IMM_PORT =>
 						current_state <= 7;
@@ -274,6 +292,9 @@ begin
 				when others =>
 					current_state <= 99;
 					fsm_state <= Init;
+					
+					assert false report "Invalid state: " & fsm_state_type'image(fsm_state) severity failure;
+					
 			end case;
 			
 		end if;

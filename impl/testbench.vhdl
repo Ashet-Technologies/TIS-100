@@ -107,17 +107,15 @@ begin
 		write(
 			clk => clk, 
 			address => 0, 
-		value => 24); 
-		--value => 57);
+			value => 25); 
 		write(
 			clk => clk, 
-		address => 1, 
-    value => 03);
-		--value => 1);
+			address => 1, 
+			value => 2);
 		write(
 			clk => clk, 
 			address => 2, 
-			value => 0);
+			value => 22);
 		write(
 			clk => clk, 
 			address => 3, 

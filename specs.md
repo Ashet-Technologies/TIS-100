@@ -137,12 +137,12 @@ each emphasised character has a special meaning.
 | NOP              | 0x00                |                            | Yes     |
 | SWP              | 0x01                |                            | Yes     | 
 | SAV              | 0x02                |                            | Yes     |
-| ADD <SRC>        | 0x*S*3              | S = `<SRC>`                |
-| SUB <SRC>        | 0x*S*4              | S = `<SRC>`                |
+| ADD <SRC>        | 0x*S*3              | S = `<SRC>`                | Yes     |
+| SUB <SRC>        | 0x*S*4              | S = `<SRC>`                | Yes     |
 | NEG              | 0x05                |                            | Yes     |
-| JRO <SRC>        | 0x*S*6              | S = `<SRC>`                |
+| JRO <SRC>        | 0x*S*6              | S = `<SRC>`                | Yes     |
 | HLT              | 0x07                |                            | Yes     |
-| MOV <SRC>, <DST> | 0x*D*8 0x0*S*       | D = `<DST>`, S = `<SRC>`   |
+| MOV <SRC>, <DST> | 0x*D*8 0x0*S*       | D = `<DST>`, S = `<SRC>`   | Yes     |
 | MOV <IMM>, <DST> | 0x*D*9 *IMM*        | D = `<DST>`, IMM = `<IMM>` | Yes     |
 | ADD <IMM>        | 0x0A *IMM*          | IMM = `<IMM>`              | Yes     |
 | SUB <IMM>        | 0x0B *IMM*          | IMM = `<IMM>`              | Yes     |
@@ -170,55 +170,3 @@ An immediate value is encoded with an 8 bit [two's complement](https://en.wikipe
 
 ### <DEST> Encoding
 A destination value is encoded by an unsigned 8 bit value.
-
-## CPU Pseudo Code
-This part documents the state machine the CPU is executing in pseudocode.
-
-	declare var info1:4, instr:4, info2:8;
-	
-	# Fetch
-	(info1, instr) ← read_byte(IP++);
-	
-	# Fetch extra if required
-	if instr[7] then # if MSB is set
-		info2 ← read_byte(IP++);
-	else
-		info2 ← 0;
-	end
-	
-	switch instr
-		case 0x0:
-			# NOP
-		case 0x1: 
-			ACC ← SAV, SAV ← ACC;
-		case 0x2:
-			SAV ← ACC;
-		case 0x3:
-			ACC ← ACC + reg(info1);
-		case 0x4:
-			ACC ← ACC - reg(info1);
-		case 0x5:
-			ACC ← -ACC;
-		case 0x6:
-			IP ← IP + reg(info1) - 1;
-		case 0x7:
-			# NOP
-		case 0x8:
-			reg(info2[4..7]) ← reg(info2[0..3]);
-		case 0x9:
-			reg(info1) ← info2;
-		case 0xA:
-			ACC ← ACC + info2
-		case 0xB:
-			ACC ← ACC - info2
-		CASE 0xC:
-			if condition(info1) then
-				IP ← info2
-			end
-		case 0xD:
-			IP ← IP + info2 - 1;
-		case 0xE:
-			# NOP
-		case 0xF:
-			# NOP
-	end
