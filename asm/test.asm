@@ -1,0 +1,25 @@
+
+# Test Comments and all mnemonics:
+NOP
+SWP
+SAV
+# ADD <SRC>
+# ADD <IMM>
+# SUB <SRC>
+# SUB <IMM>
+NEG
+# JRO <SRC>
+# JRO <IMM>
+HLT
+# MOV <SRC> <DST>
+# MOV <IMM> <DST>
+JMP TARGET
+JEZ TARGET
+JNZ TARGET
+JGZ TARGET
+JLZ TARGET
+
+# Test Label Name Ambiguity
+JMP LEFT
+JMP RIGHT
+JMP 100

@@ -12,16 +12,29 @@ Accumulator, used for working.
 
 ### BAK
 Allows storing a backup value, cannot be accessed directly.
+> Is not directly addressable.
 
 ### NIL
 Always zero, ignores writes.
 
-### IO
-A write to this register writes a word to the port.
-A read from this register reads a word from the port.
-
 ### IP
 Instruction pointer. Stores the next instruction that is executed.
+> Is not directly addressable.
+
+## IO Ports
+IO ports allow communication with the outer world. There are 8 ports
+whereby 4 of them are named.
+
+| Port Name | Mnemonic |
+|-----------|----------|
+| PORT0     | LEFT     |
+| PORT1     | UP       |
+| PORT2     | RIGHT    |
+| PORT3     | DOWN     |
+| PORT4     |          |
+| PORT5     |          |
+| PORT6     |          |
+| PORT7     |          |
 
 ## Program Memory
 The CPU can address a maximum of 256 instructions which are stored in the program memory.
