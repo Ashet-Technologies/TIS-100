@@ -1,5 +1,5 @@
-# TIS-50
-Tesselated Intelligence System 50
+# TIS-100
+Tesselated Intelligence System 100
 
 ## Word Size
 8 Bit
