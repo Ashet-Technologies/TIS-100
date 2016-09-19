@@ -39,10 +39,7 @@ class Program
 				continue;
 			}
 		}
-	
-		foreach(var lbl in labels)
-			Console.WriteLine("{0}: {1}", lbl.Key, lbl.Value);
-	
+
 		foreach(var patch in patches)
 		{
 			try {
