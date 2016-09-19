@@ -105,18 +105,21 @@ class Program
 		Register src = Register.Invalid;
 		Register dst = Register.Invalid;
 		
+		if(Enum.TryParse<Register>(arg1.Value, out src) == false)
+			src = Register.Invalid;
+		if(Enum.TryParse<Register>(arg2.Value, out dst) == false)
+			dst = Register.Invalid;
+		
 		string target = null;
 		if(lblref.Length > 0 || arg1.Length > 0)
 		{
 			if(lblref.Length > 0)
 				target = lblref.Value;
 			else {
-				if (IMM != null)
-					throw new InvalidOperationException("A number cannot be a jump target.");
 				target = arg1.Value;
+				if(IMM != null)
+					target = null;
 			}
-			if(string.IsNullOrEmpty(target))
-				throw new InvalidOperationException("Invalid label!");
 		}
 		
 		switch(mnemonic.Value)
@@ -131,24 +134,60 @@ class Program
 				code.Add(0x02);
 				break;
 			case "ADD":
-				throw new NotImplementedException();
+				if (IMM != null) {
+					// ADD <IMM>        | 0x0A *IMM*
+					code.Add(0x0A);
+					code.Add((byte)IMM);
+				} else if(src != Register.Invalid) {
+					// ADD <SRC>        | 0x*S*3
+					code.Add((byte)(((int)src) << 4 | 0x03));
+				} else {
+					throw new InvalidOperationException("Invalid operand to ADD.");
+				}
+				break;
 			case "SUB":
-				throw new NotImplementedException();
+				if (IMM != null) {
+					// SUB <IMM>        | 0x0B *IMM*
+					code.Add(0x0B);
+					code.Add((byte)IMM);
+				} else if(src != Register.Invalid) {
+					// SUB <SRC>        | 0x*S*4
+					code.Add((byte)(((int)src) << 4 | 0x04));
+				} else {
+					throw new InvalidOperationException("Invalid operand to SUB.");
+				}
+				break;
 			case "NEG":
 				code.Add(0x05);
 				break;
 			case "JRO":
-				throw new NotImplementedException();
-				if(IMM == null)
-					throw new InvalidOperationException("Requires <IMM>");
-				code.Add(0x0D);
-				code.Add((byte)IMM);
+				if (IMM != null) {
+					// JRO <IMM>        | 0x0D *IMM* 
+					code.Add(0x0D);
+					code.Add((byte)IMM);
+				} else if(src != Register.Invalid) {
+					// JRO <SRC>        | 0x*S*6
+					code.Add((byte)(((int)src) << 4 | 0x06));
+				} else {
+					throw new InvalidOperationException("Invalid operand to JRO.");
+				}
 				break;
 			case "HLT":
 				code.Add(0x07);
 				break;
 			case "MOV":
-				throw new NotImplementedException();
+				if (IMM != null) {
+					// MOV <IMM>, <DST> | 0x*D*9 *IMM*
+					code.Add((byte)(((int)dst) << 4 | 0x09));
+					code.Add((byte)IMM);
+				} else if(src != Register.Invalid) {
+					// MOV <SRC>, <DST> | 0x*D*8 0x0*S*
+					code.Add((byte)(((int)dst) << 4 | 0x08));
+					code.Add((byte)src);
+				} else {
+					throw new InvalidOperationException("Invalid operand to MOV.");
+				}
+				break;
 			case "JMP":
 				if(target == null) throw new InvalidOperationException("Requires label name!");
 				code.Add(0x0C);
@@ -184,7 +223,7 @@ class Program
 	
 	enum Register : byte
 	{
-		Invalid = 0x0
+		Invalid = 0x0,
 		ACC = 0x1,
 		NIL = 0x2,
 		PORT0 = 0x8,

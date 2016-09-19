@@ -1,18 +1,17 @@
-
 # Test Comments and all mnemonics:
 NOP
 SWP
 SAV
-# ADD <SRC>
-# ADD <IMM>
-# SUB <SRC>
-# SUB <IMM>
+ADD NIL
+ADD -1
+SUB NIL
+SUB -1
 NEG
-# JRO <SRC>
-# JRO <IMM>
+JRO NIL
+JRO -1
 HLT
-# MOV <SRC> <DST>
-# MOV <IMM> <DST>
+MOV NIL NIL
+MOV -1  NIL
 JMP TARGET
 JEZ TARGET
 JNZ TARGET
@@ -22,4 +21,4 @@ JLZ TARGET
 # Test Label Name Ambiguity
 JMP LEFT
 JMP RIGHT
-JMP 100
+JMP 100 # <- Should invoke an error
