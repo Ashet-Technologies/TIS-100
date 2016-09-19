@@ -34,22 +34,41 @@ architecture default of testbench is
 		wait for 1 ns;
 	end procedure;
 	
-	function datum (x : integer) 
+	function compile (x : integer) 
 		return std_logic_vector is
 	begin
 		return std_logic_vector(to_unsigned(x, 8));
-	end datum;
+	end function;
+	
+	function datum (x : integer) 
+		return std_logic_vector is
+	begin
+		return std_logic_vector(to_signed(x, 8));
+	end function;
 	
 	function program_memory (addr : std_logic_vector(7 downto 0)) 
 		return std_logic_vector is
 	begin
 		case to_integer(unsigned(addr)) is
-			when 0 => return datum(16#98#);
-			when 1 => return datum(16#08#);
-			when 2 => return datum(16#98#);
-			when 3 => return datum(16#08#);
-			when 4 => return datum(7);
-			when others => return datum(0);
+			when 0 => return compile(16#18#);
+			when 1 => return compile(16#09#);
+			when 2 => return compile(16#4C#);
+			when 3 => return compile(16#0A#);
+			when 4 => return compile(16#3C#);
+			when 5 => return compile(16#0E#);
+			when 6 => return compile(16#B8#);
+			when 7 => return compile(16#01#);
+			when 8 => return compile(16#0C#);
+			when 9 => return compile(16#00#);
+			when 10 => return compile(16#88#);
+			when 11 => return compile(16#01#);
+			when 12 => return compile(16#0C#);
+			when 13 => return compile(16#00#);
+			when 14 => return compile(16#A8#);
+			when 15 => return compile(16#01#);
+			when 16 => return compile(16#0C#);
+			when 17 => return compile(16#00#);
+			when others => return compile(0);
 		end case;
 	end function;
 	
@@ -57,10 +76,9 @@ architecture default of testbench is
 		return std_logic_vector is
 	begin
 		case to_integer(unsigned(addr)) is
-			when 0 => return datum(10);
-			when 1 => return datum(20);
-			when 2 => return datum(30);
-			when 3 => return datum(40);
+			when 0 => return datum(-10);
+			when 1 => return datum(0);
+			when 2 => return datum(10);
 			when others => return datum(0);
 		end case;
 	end function;
@@ -83,7 +101,7 @@ architecture default of testbench is
 	
 	signal port_tb_writing : std_logic := '0';
 
-	signal input_addr   : std_logic_vector(3 downto 0);
+	signal input_addr   : std_logic_vector(3 downto 0) := "0000";
 	
 begin
 	
@@ -140,17 +158,17 @@ begin
 				if port_read = '1' then
 					port_tb_writing <= '1';
 					input_addr <= std_logic_vector(unsigned(input_addr) + to_unsigned(1, 4));
-					if input_addr = "1111" then
+					if to_integer(unsigned(input_addr)) = 7 then
 						assert false report "end of input stream" severity note;
 						wait;
 					end if;
 					port_reg_in <= input_stream(input_addr);
-					report
-						"Reading " & 
-						integer'image(to_integer(unsigned(input_stream(input_addr)))) &
-						" into the port(" & 
-						integer'image(to_integer(unsigned(port_num))) & 
-						")";
+					--report
+						--"Reading " & 
+						--integer'image(to_integer(unsigned(input_stream(input_addr)))) &
+						--" into the port(" & 
+						--integer'image(to_integer(unsigned(port_num))) & 
+						--")";
 					port_ready <= '1';
 				else
 					port_tb_writing <= '0';

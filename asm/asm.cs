@@ -17,7 +17,7 @@ class Program
 
 	static int Main(string[] args)
 	{
-		if(args.Length != 1)
+		if(args.Length < 1)
 		{
 			Console.WriteLine("Usage: asm [fileName]");
 			return 0;
@@ -53,22 +53,21 @@ class Program
 			}
 		}
 		
-		Console.Write("{0}\r\n", new HexRecord(
-			(RecordType)0x02,
-			0,
-			new byte[] { 0x10, 0x00 }));
-	
-		Console.WriteLine(new HexRecord(RecordType.Data, code.ToArray()));
-		Console.WriteLine(HexRecord.EndOfFile);
-		/*
-		for(int i = 0; i < code.Count; i++)
+		if(args.Length > 1)
 		{
-			if(i > 0 && (i % 16) == 0)
-				Console.WriteLine();
-			Console.Write("{0:X2} ", code[i]);
+			for(int i = 0; i < code.Count; i++)
+			{
+				Console.WriteLine(
+					"when {0} => return compile(16#{1:X2}#);",
+					i,
+					code[i]);
+			}
 		}
-		Console.WriteLine();
-		*/
+		else
+		{		
+			Console.WriteLine(new HexRecord(RecordType.Data, code.ToArray()));
+			Console.WriteLine(HexRecord.EndOfFile);
+		}
 		return 0;
 	}
 	
