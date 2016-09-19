@@ -12,9 +12,9 @@ class Program
 	static List<byte> code = new List<byte>();
 	
 	static readonly Regex matcher = new Regex(
-		@"^\s*(?:(?<label>[A-Z]+):)?\s*(?:(?<mnemonic>NOP|HLT|MOV|SWP|SAV|ADD|SUB|NEG|JMP|JEZ|JNZ|JGZ|JLZ|JRO)(?:\s+(?<arg1>LEFT|RIGHT|UP|DOWN|ACC|NIL|PORT[0-7]|-?\d?\d?\d))?(?:\s+(?<arg2>LEFT|RIGHT|UP|DOWN|ACC|NIL|PORT[0-7]))?(?:\s+(?<ref>[A-Z]+))?)?\s*(?<comment>#.*)?$", 
+		@"^\s*(?:(?<label>[A-Z0-9]+):)?\s*(?:(?<mnemonic>NOP|HLT|MOV|SWP|SAV|ADD|SUB|NEG|JMP|JEZ|JNZ|JGZ|JLZ|JRO)(?:\s+(?<arg1>LEFT|RIGHT|UP|DOWN|ACC|NIL|PORT[0-7]|-?\d?\d?\d))?(?:(?:\s*,\s*|\s+)(?<arg2>LEFT|RIGHT|UP|DOWN|ACC|NIL|PORT[0-7]))?(?:\s+(?<ref>[A-Z0-9]+))?)?\s*(?<comment>#.*)?$", 
 		RegexOptions.Compiled);
-			
+
 	static int Main(string[] args)
 	{
 		if(args.Length != 1)
@@ -140,9 +140,10 @@ class Program
 					code.Add((byte)IMM);
 				} else if(src != Register.Invalid) {
 					// ADD <SRC>        | 0x*S*3
+					if(src == Register.Invalid) throw new InvalidOperationException("Invalid <SRC>.");
 					code.Add((byte)(((int)src) << 4 | 0x03));
 				} else {
-					throw new InvalidOperationException("Invalid operand to ADD.");
+					if(src == Register.Invalid) throw new InvalidOperationException("Invalid <SRC>.");
 				}
 				break;
 			case "SUB":
@@ -152,9 +153,10 @@ class Program
 					code.Add((byte)IMM);
 				} else if(src != Register.Invalid) {
 					// SUB <SRC>        | 0x*S*4
+					if(src == Register.Invalid) throw new InvalidOperationException("Invalid <SRC>.");
 					code.Add((byte)(((int)src) << 4 | 0x04));
 				} else {
-					throw new InvalidOperationException("Invalid operand to SUB.");
+					if(src == Register.Invalid) throw new InvalidOperationException("Invalid <SRC>.");
 				}
 				break;
 			case "NEG":
@@ -167,9 +169,10 @@ class Program
 					code.Add((byte)IMM);
 				} else if(src != Register.Invalid) {
 					// JRO <SRC>        | 0x*S*6
+					if(src == Register.Invalid) throw new InvalidOperationException("Invalid <SRC>.");
 					code.Add((byte)(((int)src) << 4 | 0x06));
 				} else {
-					throw new InvalidOperationException("Invalid operand to JRO.");
+					if(src == Register.Invalid) throw new InvalidOperationException("Invalid <SRC>.");
 				}
 				break;
 			case "HLT":
@@ -178,14 +181,17 @@ class Program
 			case "MOV":
 				if (IMM != null) {
 					// MOV <IMM>, <DST> | 0x*D*9 *IMM*
+					if(dst == Register.Invalid) throw new InvalidOperationException("Invalid <DST>.");
 					code.Add((byte)(((int)dst) << 4 | 0x09));
 					code.Add((byte)IMM);
 				} else if(src != Register.Invalid) {
 					// MOV <SRC>, <DST> | 0x*D*8 0x0*S*
+					if(src == Register.Invalid) throw new InvalidOperationException("Invalid <SRC>.");
+					if(dst == Register.Invalid) throw new InvalidOperationException("Invalid <DST>.");
 					code.Add((byte)(((int)dst) << 4 | 0x08));
 					code.Add((byte)src);
 				} else {
-					throw new InvalidOperationException("Invalid operand to MOV.");
+					if(src == Register.Invalid) throw new InvalidOperationException("Invalid <SRC>.");
 				}
 				break;
 			case "JMP":
