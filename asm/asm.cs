@@ -52,7 +52,15 @@ class Program
 					patch.Value.Item2);
 			}
 		}
+		
+		Console.Write("{0}\r\n", new HexRecord(
+			(RecordType)0x02,
+			0,
+			new byte[] { 0x10, 0x00 }));
 	
+		Console.WriteLine(new HexRecord(RecordType.Data, code.ToArray()));
+		Console.WriteLine(HexRecord.EndOfFile);
+		/*
 		for(int i = 0; i < code.Count; i++)
 		{
 			if(i > 0 && (i % 16) == 0)
@@ -60,7 +68,7 @@ class Program
 			Console.Write("{0:X2} ", code[i]);
 		}
 		Console.WriteLine();
-	
+		*/
 		return 0;
 	}
 	
