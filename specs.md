@@ -42,10 +42,12 @@ The CPU can address a maximum of 256 instructions which are stored in the progra
 ## Instruction Set
 
 > Notation Hints:
-> <SRC> or <DST> means any of ACC, NIL or IO.
-> <IMM> means an immediate number from -128 to +127.
-> <DEST> means an address between 0 and 255.
-> IP is the instruction pointer.
+>
+> &lt;SRC&gt; or &lt;DST&gt; means any of ACC, NIL or IO.
+>
+> &lt;IMM&gt; means an immediate number from -128 to +127.
+>
+> &lt;DEST&gt; means an address between 0 and 255.
 
 ### NOP
 Waits one cycle.
@@ -53,12 +55,12 @@ Waits one cycle.
 ### HLT
 Halts the machine.
 
-### MOV <SRC>, <DST>
+### MOV &lt;SRC&gt;, &lt;DST&gt;
 Copies `<SRC>` to `DST`.
 
 	<DST> ← <SRC>;
 
-### MOV <IMM>, <DST>
+### MOV &lt;IMM&gt;, &lt;DST&gt;
 Copies `<IMM>` to `DST`.
 
 	<DST> ← <IMM>;
@@ -73,22 +75,22 @@ Copies `ACC` to `BAK`
 
 	SAV ← ACC;
 
-### ADD <SRC>
+### ADD &lt;SRC&gt;
 Adds `<SRC>` to `ACC`
 
 	ACC ← ACC + <SRC>;
 	
-### ADD <IMM>
+### ADD &lt;IMM&gt;
 Adds `<IMM>` to `ACC`
 
 	ACC ← ACC + <IMM>;
 
-### SUB <SRC>
+### SUB &lt;SRC&gt;
 Subtracts `<SRC>` from `ACC`
 
 	ACC ← ACC - <SRC>;
 
-### SUB <IMM>
+### SUB &lt;IMM&gt;
 Subtracts `<IMM>` from `ACC`
 
 	ACC ← ACC - <IMM>;
@@ -98,42 +100,42 @@ Negates `ACC`:
 
 	ACC ← -(ACC);
 
-### JMP <DEST>
+### JMP &lt;DEST&gt;
 Jumps to the address `<DEST>`.
 
 	IP ← <DEST>;
 
-### JEZ <DEST>
+### JEZ &lt;DEST&gt;
 Jumps to the address `<DEST>` if `ACC` is zero.
 
 	if ACC == 0:
 		IP ← <DEST>;
 
-### JNZ <DEST>
+### JNZ &lt;DEST&gt;
 Jumps to the address `<DEST>` if `ACC` is not zero.
 
 	if ACC != 0:
 		IP ← <DEST>;
 
-### JGZ <DEST>
+### JGZ &lt;DEST&gt;
 Jumps to the address `<DEST>` if `ACC` is greater than zero.
 
 	if ACC > 0:
 		IP ← <DEST>;
 
-### JLZ <DEST>
+### JLZ &lt;DEST&gt;
 Jumps to the address `<DEST>` if `ACC` is less than zero.
 
 	if ACC < 0:
 		IP ← <DEST>;
 
-### JRO <SRC>
+### JRO &lt;SRC&gt;
 Jumps to the relative address given in `<SRC>`.
 > Note that some commands use 2 bytes and some commands only one.
 
 	IP ← IP + <SRC>;
 	
-### JRO <IMM>
+### JRO &lt;IMM&gt;
 Jumps to the relative address given with `<IMM>`.
 > Note that some commands use 2 bytes and some commands only one.
 
@@ -168,7 +170,7 @@ each emphasised character has a special meaning.
 |                  | 0x0E *???*          | Reserved for later use.    |
 |                  | 0x0F *???*          | Reserved for later use.    |
 
-### <SRC>, <DST> Encoding
+### &lt;SRC&gt;, &lt;DST&gt; Encoding
 A `<SRC>` or `<DST>` target is encoded with a nibble (4 bits).
 
 | Value    | Target       |
@@ -178,8 +180,8 @@ A `<SRC>` or `<DST>` target is encoded with a nibble (4 bits).
 | 0x2      | NIL          |
 | 0x8..0xF | IO Port 0..7 |
 
-### <IMM> Encoding
+### &lt;IMM&gt; Encoding
 An immediate value is encoded with an 8 bit [two's complement](https://en.wikipedia.org/wiki/Two%27s_complement) value.
 
-### <DEST> Encoding
+### &lt;DEST&gt; Encoding
 A destination value is encoded by an unsigned 8 bit value.
