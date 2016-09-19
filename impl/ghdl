@@ -1,0 +1,1 @@
+ghdl -a *.vhdl && ghdl -e testbench && ghdl -r testbench --vcd=testbench.vcd

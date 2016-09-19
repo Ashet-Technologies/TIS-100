@@ -18,7 +18,7 @@ entity tis100 is
 		mem_val    : in  std_logic_vector(7 downto 0);
 		mem_enable : out std_logic;
 		mem_ready  : in  std_logic
-		);
+	);
 
 end tis100;
 

@@ -7,16 +7,6 @@ entity testbench is
 end testbench;
 
 architecture default of testbench is
-
-	component ram is 
-		port (
-			clock   : in  std_logic;
-			we      : in  std_logic;
-			address : in  std_logic_vector;
-			datain  : in  std_logic_vector;
-			dataout : out std_logic_vector
-		);
-	end component;
 	
 	component tis100 is
 		port(
@@ -43,17 +33,44 @@ architecture default of testbench is
 		clk <= '0';
 		wait for 1 ns;
 	end procedure;
+	
+	function datum (x : integer) 
+		return std_logic_vector is
+	begin
+		return std_logic_vector(to_unsigned(x, 8));
+	end datum;
+	
+	function program_memory (addr : std_logic_vector(7 downto 0)) 
+		return std_logic_vector is
+	begin
+		case to_integer(unsigned(addr)) is
+			when 0 => return datum(16#98#);
+			when 1 => return datum(16#08#);
+			when 2 => return datum(16#98#);
+			when 3 => return datum(16#08#);
+			when 4 => return datum(7);
+			when others => return datum(0);
+		end case;
+	end function;
+	
+	function input_stream(addr : std_logic_vector(3 downto 0))
+		return std_logic_vector is
+	begin
+		case to_integer(unsigned(addr)) is
+			when 0 => return datum(10);
+			when 1 => return datum(20);
+			when 2 => return datum(30);
+			when 3 => return datum(40);
+			when others => return datum(0);
+		end case;
+	end function;
 
 	signal clk          : std_logic := '0';
 
-	signal ram_we       : std_logic := '0';
-	signal ram_address  : std_logic_vector(7 downto 0);
-	signal ram_input    : std_logic_vector(7 downto 0);
-	signal ram_output   : std_logic_vector(7 downto 0);
-	signal ram_enable   : std_logic := '0';
-	signal ram_ready    : std_logic := '0';
-	
-	signal mem_address  : std_logic_vector(7 downto 0);
+	signal code_address  : std_logic_vector(7 downto 0);
+	signal code_output   : std_logic_vector(7 downto 0);
+	signal code_enable   : std_logic := '0';
+	signal code_ready    : std_logic := '0';
 	
 	signal port_reg_in  : std_logic_vector(7 downto 0);
 	signal port_reg_out : std_logic_vector(7 downto 0);
@@ -65,16 +82,10 @@ architecture default of testbench is
 	signal halt         : std_logic := '0';
 	
 	signal port_tb_writing : std_logic := '0';
+
+	signal input_addr   : std_logic_vector(3 downto 0);
 	
 begin
-
-	ram0: ram port map (
-		clock   => clk, 
-		we      => ram_we,
-		address => ram_address,
-		datain  => ram_input,
-		dataout => ram_output
-	);
 	
 	tis0 : tis100 port map (
 		clk        => clk,
@@ -86,54 +97,23 @@ begin
 		io_write   => port_write,
 		io_ready   => port_ready,
 		io_port    => port_num,
-		mem_addr   => mem_address,
-		mem_val    => ram_output,
-		mem_enable => ram_enable,
-		mem_ready  => ram_ready
+		mem_addr   => code_address,
+		mem_val    => code_output,
+		mem_enable => code_enable,
+		mem_ready  => code_ready
 	);
 
 	process
-		procedure write(
-			signal clk : out std_logic;
-			address : in integer;
-			value : in integer) is
-		begin
-			ram_input   <= std_logic_vector(to_unsigned(value, ram_input'length));
-			ram_address <= std_logic_vector(to_unsigned(address, ram_address'length));
-			ram_we <= '1';
-			tick(clk => clk);
-			ram_we <= '0';
-		end procedure;
+		
 	begin
 		wait for 1 ns;
 		
-		write(
-			clk => clk, 
-			address => 0, 
-			value => 16#18#); 
-		write(
-			clk => clk, 
-			address => 1, 
-			value => 16#0F#);
-		write(
-			clk => clk, 
-			address => 2, 
-			value => 0);
-		write(
-			clk => clk, 
-			address => 3, 
-			value => 0);
-		write(
-			clk => clk, 
-			address => 4, 
-			value => 7); -- HLT
-		
 		while halt = '0' loop
-			if ram_enable = '1' then
-				ram_address <= mem_address;
-				ram_ready <= '1';
+			if code_enable = '1' then
+				code_output <= program_memory(code_address);
+				code_ready <= '1';
 			else
-				ram_ready <= '0';
+				code_ready <= '0';
 			end if;
 			
 			if port_write = '1' and port_read = '1' then
@@ -159,8 +139,18 @@ begin
 				end if;
 				if port_read = '1' then
 					port_tb_writing <= '1';
-					port_reg_in <= std_logic_vector(to_signed(42, port_reg_in'length));
-					report "Reading 42 into the port(" & integer'image(to_integer(unsigned(port_num))) & ")";
+					input_addr <= std_logic_vector(unsigned(input_addr) + to_unsigned(1, 4));
+					if input_addr = "1111" then
+						assert false report "end of input stream" severity note;
+						wait;
+					end if;
+					port_reg_in <= input_stream(input_addr);
+					report
+						"Reading " & 
+						integer'image(to_integer(unsigned(input_stream(input_addr)))) &
+						" into the port(" & 
+						integer'image(to_integer(unsigned(port_num))) & 
+						")";
 					port_ready <= '1';
 				else
 					port_tb_writing <= '0';

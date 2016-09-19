@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.72 (w)1999-2016 BSI
-[*] Sun Sep 18 15:11:09 2016
+[*] Mon Sep 19 20:52:40 2016
 [*]
-[dumpfile] "/home/felix/projects/tis-50/impl/testbench.vcd"
-[dumpfile_mtime] "Sun Sep 18 15:10:58 2016"
-[dumpfile_size] 3993
-[savefile] "/home/felix/projects/tis-50/impl/testbench.gtkw"
+[dumpfile] "/home/felix/projects/tis-100/impl/testbench.vcd"
+[dumpfile_mtime] "Mon Sep 19 20:52:12 2016"
+[dumpfile_size] 3484
+[savefile] "/home/felix/projects/tis-100/impl/testbench.gtkw"
 [timestart] 0
 [size] 1596 861
 [pos] -1 -1
-*-23.067307 5050000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-23.335239 22280000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [sst_width] 229
 [signals_width] 197
 [sst_expanded] 1
@@ -35,30 +35,22 @@ tis0.current_state
 -
 @22
 tis0.mem_addr[7:0]
-ram_address[7:0]
-ram_output[7:0]
-@28
-ram_we
 @200
 -
-@28
-ram_enable
-ram_ready
-@200
 -
-@22
-tis0.io[7:0]
 @28
 tis0.io_ready
 tis0.io_read
 tis0.io_write
 @200
 -
-@23
-port_reg[7:0]
 @28
 port_ready
 port_read
 port_write
+@22
+port_reg_in[7:0]
+@23
+port_reg_out[7:0]
 [pattern_trace] 1
 [pattern_trace] 0
