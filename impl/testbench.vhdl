@@ -18,7 +18,7 @@ architecture default of testbench is
 		);
 	end component;
 	
-	component tis50 is
+	component tis100 is
 		port(
 			clk        : in  std_logic;
 			rst        : in  std_logic;
@@ -76,7 +76,7 @@ begin
 		dataout => ram_output
 	);
 	
-	tis0 : tis50 port map (
+	tis0 : tis100 port map (
 		clk        => clk,
 		rst        => '0',
 		hlt        => halt,

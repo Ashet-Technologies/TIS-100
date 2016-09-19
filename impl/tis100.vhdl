@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity tis50 is
+entity tis100 is
 
 	port(
 		clk        : in  std_logic;
@@ -20,9 +20,9 @@ entity tis50 is
 		mem_ready  : in  std_logic
 		);
 
-end tis50;
+end tis100;
 
-architecture standard of tis50 is
+architecture standard of tis100 is
 	
 	type fsm_state_type is (
 		Init,
