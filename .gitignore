@@ -5,3 +5,4 @@
 *.exe
 *.hex
 impl/testbench
+emu/t21
