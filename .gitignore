@@ -6,3 +6,4 @@
 *.hex
 impl/testbench
 emu/t21
+emu/decode

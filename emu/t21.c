@@ -4,9 +4,29 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+const char *registerName[16] = {
+	"INVALID",
+	"ACC",
+	"NIL",
+	"???",
+	"???",
+	"???",
+	"???",
+	"???",
+	"LEFT",
+	"UP",
+	"RIGHT",
+	"DOWN",
+	"PORT4",
+	"PORT5",
+	"PORT6",
+	"PORT7",
+};
+
+// #define DEBUG(args...) fprintf(stderr, args)
+#define DEBUG(args...)
+
 uint8_t rom[256] = {
-	0x89,
-	0x21,
 	0x07,
 };
 
@@ -17,7 +37,10 @@ uint8_t IP = 0;
 int8_t read_reg(int reg)
 {
 	if(reg >= 0x8) {
-		return (int8_t)(uint8_t)getc(stdin);
+		int val = getc(stdin);
+		if(val == EOF) exit(0);
+		
+		return (int8_t)(uint8_t)val;
 	}
 	switch(reg)
 	{
@@ -113,6 +136,7 @@ int main(int argc, char **argv)
 			case 0x0: break;
 /*| SWP              | 0x01                |                            | Yes     | */
 			case 0x1: {
+				DEBUG("SWP\n");
 				uint8_t tmp = BAK;
 				BAK = ACC;;
 				ACC = tmp;
@@ -120,51 +144,61 @@ int main(int argc, char **argv)
 			}
 /*| SAV              | 0x02                |                            | Yes     |*/
 			case 0x2: {
+				DEBUG("SAV\n");
 				BAK = ACC;
 				break;
 			}
 /*| ADD <SRC>        | 0x*S*3              | S = `<SRC>`                | Yes     |*/
 			case 0x3: {
+				DEBUG("ADD %s\n", registerName[info1]);
 				ACC += read_reg(info1);
 				break;
 			}
 /*| SUB <SRC>        | 0x*S*4              | S = `<SRC>`                | Yes     |*/
 			case 0x4: {
+				DEBUG("SUB %s\n", registerName[info1]);
 				ACC -= read_reg(info1);
 				break;
 			}
 /*| NEG              | 0x05                |                            | Yes     |*/
 			case 0x5: {
+				DEBUG("NEG\n");
 				ACC = -ACC;
 				break;
 			}
 /*| JRO <SRC>        | 0x*S*6              | S = `<SRC>`                | Yes     |*/
 			case 0x6: {
+				DEBUG("JRO %s\n", registerName[info1]);
 				IP += read_reg(info1);
 				break;
 			}
 /*| HLT              | 0x07                |                            | Yes     |*/
 			case 0x7: {
+				DEBUG("HTL\n");
 				exit(0);
 			}
 /*| MOV <SRC>, <DST> | 0x*D*8 0x0*S*       | D = `<DST>`, S = `<SRC>`   | Yes     |*/
 			case 0x8: {
+				DEBUG("MOV %s %s\n", registerName[info2], registerName[info1]);
 				write_reg(info1, read_reg(info2));
 				break;
 			}
 /*| MOV <IMM>, <DST> | 0x*D*9 *IMM*        | D = `<DST>`, IMM = `<IMM>` | Yes     |*/
 			case 0x9: {
+				DEBUG("MOV %d %s\n", info2, registerName[info1]);
 				write_reg(info1, info2);
 				break;
 			}
 /*| ADD <IMM>        | 0x0A *IMM*          | IMM = `<IMM>`              | Yes     |*/
 			case 0xA: {
-				ACC += read_reg(info2);
+				DEBUG("ADD %d\n\n", (int8_t)info2);
+				ACC += (int8_t)info2;
 				break;
 			}
 /*| SUB <IMM>        | 0x0B *IMM*          | IMM = `<IMM>`              | Yes     |*/
 			case 0xB: {
-				ACC += read_reg(info2);
+				DEBUG("SUB %d\n", (int8_t)info2);
+				ACC -= (int8_t)info2;
 				break;
 			}
 /*| JMP <DEST>       | 0x0C *DEST*         | DEST = `<DEST>`            | Yes     |*/
@@ -175,22 +209,27 @@ int main(int argc, char **argv)
 			case 0xC: {
 				switch(info1) {
 					case 0x0: {
+						DEBUG("JMP %d\n", info2);
 						IP = info2;
 						break;
 					}
 					case 0x1: {
+						DEBUG("JEZ %d\n", info2);
 						if(ACC == 0) IP = info2;
 						break;
 					}
 					case 0x2: {
+						DEBUG("JNZ %d\n", info2);
 						if(ACC != 0) IP = info2;
 						break;
 					}
 					case 0x3: {
+						DEBUG("JGZ %d\n", info2);
 						if(ACC > 0) IP = info2;
 						break;
 					}
 					case 0x4: {
+						DEBUG("JLZ %d\n", info2);
 						if(ACC < 0) IP = info2;
 						break;
 					}
@@ -200,11 +239,14 @@ int main(int argc, char **argv)
 			}
 /*| JRO <IMM>        | 0x0D *IMM*          | IMM = `<IMM>`              | Yes     |*/
 			case 0xD: {
+				DEBUG("JRO %d\n", (int8_t)info2);
 				IP += read_reg(info2);
 				break;
 			}
 			default: exit(1);
 		}
+		
+		// fprintf(stderr, "%d (%d)\n", ACC, BAK);
 	}
 
 	return 0;
